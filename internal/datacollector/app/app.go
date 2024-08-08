@@ -14,9 +14,11 @@ type App struct {
 }
 
 func NewApp() *App {
+	c := datacollector.NewConfig()
+
 	return &App{
-		config:    datacollector.NewConfig(),
-		scheduler: scheduler.NewScheduler(5),
+		config:    c,
+		scheduler: scheduler.NewScheduler(c.CollectorConfig.Interval),
 	}
 }
 

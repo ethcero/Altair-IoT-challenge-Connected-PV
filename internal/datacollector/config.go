@@ -3,6 +3,7 @@ package datacollector
 import (
 	"context"
 	"os"
+	"strconv"
 )
 
 type Config struct {
@@ -18,8 +19,9 @@ type IoTconfig struct {
 }
 
 type CollectorConfig struct {
-	Model   string
-	Address string
+	Model    string
+	Address  string
+	Interval int
 }
 
 type PublisherConfig struct {
@@ -46,8 +48,9 @@ func NewConfig() Config {
 			ThingID: os.Getenv("IOT_THING_ID"),
 		},
 		CollectorConfig: CollectorConfig{
-			Model:   os.Getenv("COLLECTOR_MODEL"),
-			Address: os.Getenv("COLLECTOR_ADDRESS"),
+			Model:    os.Getenv("COLLECTOR_MODEL"),
+			Address:  os.Getenv("COLLECTOR_ADDRESS"),
+			Interval: castToInt(getEnvOrDefault("COLLECTOR_INTERVAL", "5")),
 		},
 		PublisherConfig: PublisherConfig{
 			Connector: os.Getenv("PUBLISHER_CONNECTOR"),
@@ -60,6 +63,22 @@ func NewConfig() Config {
 	}
 	checkConfig(c)
 	return c
+}
+
+func castToInt(value string) int {
+	i, err := strconv.Atoi(value)
+	if err != nil {
+		panic("Error casting to int: " + value)
+	}
+	return i
+}
+
+func getEnvOrDefault(key string, defaultValue string) string {
+	value := os.Getenv(key)
+	if value == "" {
+		return defaultValue
+	}
+	return value
 }
 
 func checkConfig(config Config) {
