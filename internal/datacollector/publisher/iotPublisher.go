@@ -26,7 +26,7 @@ func (p *IotPublisher) Start() {
 	go func() {
 		err := p.Mqtt.Connect()
 		if err != nil {
-			log.Fatal("Error connecting to MQTT broker: %s", err)
+			log.Fatalf("Error connecting to MQTT broker: %s", err)
 		}
 	}()
 }
@@ -39,7 +39,7 @@ func (p *IotPublisher) Publish(data datacollector.BusMessage) error {
 		return err
 	}
 
-	log.Println("Publishing data to topic: %s", topic)
-	log.Println("Data: %s", string(dataBytes))
+	log.Printf("Publishing data to topic: %s\n", topic)
+	log.Printf("Data: %s\n", string(dataBytes))
 	return p.Mqtt.Publish(topic, dataBytes)
 }
