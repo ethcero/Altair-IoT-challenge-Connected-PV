@@ -1,6 +1,7 @@
 package scheduler
 
 import (
+	"log"
 	"time"
 )
 
@@ -17,7 +18,7 @@ func NewScheduler(interval int) *Scheduler {
 }
 
 func (s *Scheduler) Start(task func()) {
-	println("Starting scheduler")
+	log.Println("Starting scheduler")
 
 	go func() {
 		for {
@@ -32,6 +33,6 @@ func (s *Scheduler) Start(task func()) {
 }
 
 func (s *Scheduler) Stop() {
-	println("Stopping scheduler")
+	log.Println("Stopping scheduler")
 	s.ticker.Stop()
 }
