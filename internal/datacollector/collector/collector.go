@@ -20,7 +20,7 @@ func CollectAndDispatch(c Collector, bus chan datacollector.BusMessage) {
 	if err != nil {
 		log.Println("Error gathering device data")
 	}
-	
+
 	bus <- datacollector.BusMessage{
 		PowerData:  powerData,
 		DeviceData: deviceData,
@@ -28,10 +28,10 @@ func CollectAndDispatch(c Collector, bus chan datacollector.BusMessage) {
 
 }
 
-func NewCollector(model string, address string) Collector {
-	switch model {
-	case "fronius":
-		return NewFroniusInverter(address)
+func NewCollector(config datacollector.CollectorConfig) Collector {
+	switch config.Model {
+	case datacollector.CollectorModelFronius:
+		return NewFroniusInverter(config.Address)
 	default:
 		return nil
 	}

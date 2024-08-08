@@ -1,6 +1,7 @@
 package publisher
 
 import (
+	"context"
 	"github.com/ethcero/connected-pv/internal/datacollector"
 	"github.com/ethcero/connected-pv/pkg/mqtt"
 	"log"
@@ -27,18 +28,19 @@ func HandlePublish(p Publisher, bus chan datacollector.BusMessage) {
 	}()
 }
 
-func NewPublisher(config datacollector.Config) Publisher {
+func NewPublisher(ctx context.Context, publisherConfig datacollector.PublisherConfig, iotConfig datacollector.IoTconfig) Publisher {
 
-	switch config.Config["PUBLISHER_CONNECTOR"] {
-	case "mqtt":
-		u, _ := url.Parse(config.Config["PUBLISHER_MQTT_BROKER"])
+	switch publisherConfig.Connector {
+	case datacollector.PublisherConnectorMQTT:
+		mqttConfig := publisherConfig.MqttConnectorConfig
+		u, _ := url.Parse(mqttConfig.Broker)
 		clientConfig := mqtt.ClientConfig{
-			Ctx:      config.Context,
+			Ctx:      ctx,
 			Brokers:  []*url.URL{u},
-			Username: config.Config["PUBLISHER_MQTT_USERNAME"],
-			Password: config.Config["PUBLISHER_MQTT_PASSWORD"],
+			Username: mqttConfig.Username,
+			Password: mqttConfig.Password,
 		}
-		return NewIotPublisher(config.Config["IOT_SPACE_ID"], config.Config["IOT_THING_ID"], mqtt.NewMqttConnector(clientConfig))
+		return NewIotPublisher(iotConfig.SpaceID, iotConfig.ThingID, mqtt.NewMqttConnector(clientConfig))
 	default:
 		return nil
 	}

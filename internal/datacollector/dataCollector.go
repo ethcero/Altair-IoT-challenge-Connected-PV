@@ -1,12 +1,5 @@
 package datacollector
 
-import "context"
-
-type Config struct {
-	Context context.Context
-	Config  map[string]string
-}
-
 type PowerData struct {
 	PGrid float64
 	PLoad float64
