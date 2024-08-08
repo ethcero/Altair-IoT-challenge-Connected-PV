@@ -2,6 +2,7 @@ package collector
 
 import (
 	"encoding/json"
+	"github.com/ethcero/connected-pv/internal/datacollector"
 	"github.com/ethcero/connected-pv/pkg/api"
 )
 
@@ -15,7 +16,7 @@ func NewFroniusInverter(address string) *FroniusCollector {
 	}
 }
 
-func (i *FroniusCollector) gatherPowerData() (PowerData, error) {
+func (i *FroniusCollector) gatherPowerData() (datacollector.PowerData, error) {
 
 	endpoint := i.address + "/solar_api/v1/GetPowerFlowRealtimeData.fcgi"
 
@@ -23,16 +24,16 @@ func (i *FroniusCollector) gatherPowerData() (PowerData, error) {
 		Url: endpoint,
 	})
 	if err != nil {
-		return PowerData{}, err
+		return datacollector.PowerData{}, err
 	}
 
 	var froniusPowerData FroniusPowerData
 	err = json.Unmarshal(resp.Body, &froniusPowerData)
 	if err != nil {
-		return PowerData{}, err
+		return datacollector.PowerData{}, err
 	}
 
-	powerData := PowerData{
+	powerData := datacollector.PowerData{
 		PGrid: froniusPowerData.Body.Data.Site.PGrid,
 		PLoad: froniusPowerData.Body.Data.Site.PLoad,
 		PPV:   froniusPowerData.Body.Data.Site.PPV,
@@ -40,24 +41,24 @@ func (i *FroniusCollector) gatherPowerData() (PowerData, error) {
 	return powerData, nil
 }
 
-func (i *FroniusCollector) gatherDeviceData() (DeviceData, error) {
+func (i *FroniusCollector) gatherDeviceData() (datacollector.DeviceData, error) {
 	endpoint := i.address + "/solar_api/v1/GetInverterRealtimeData.cgi?Scope=Device&DeviceId=1&DataCollection=CommonInverterData"
 
 	resp, err := api.Get(api.Request{
 		Url: endpoint,
 	})
 	if err != nil {
-		return DeviceData{}, err
+		return datacollector.DeviceData{}, err
 	}
 
 	var froniusDeviceData FroniusDeviceData
 	err = json.Unmarshal(resp.Body, &froniusDeviceData)
 	if err != nil {
-		return DeviceData{}, err
+		return datacollector.DeviceData{}, err
 	}
 
-	deviceData := DeviceData{
-		status: DeviceDataStatus{
+	deviceData := datacollector.DeviceData{
+		Status: datacollector.DeviceDataStatus{
 			ErrorCode:  froniusDeviceData.Body.Data.DeviceStatus.ErrorCode,
 			StatusCode: froniusDeviceData.Body.Data.DeviceStatus.StatusCode,
 		},
